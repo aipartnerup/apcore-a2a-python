@@ -1,19 +1,19 @@
 """Tests for ApCoreAgentExecutor."""
+
 from __future__ import annotations
 
 import asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from a2a.server.events import EventQueue
 from a2a.server.events.in_memory_queue_manager import InMemoryQueueManager
-from a2a.types import Message, Part, Role, TaskState, TaskStatusUpdateEvent, TextPart
+from a2a.types import Message, Part, Role, TaskState, TextPart
 
 from apcore_a2a.adapters.errors import ErrorMapper
 from apcore_a2a.adapters.parts import PartConverter
 from apcore_a2a.adapters.schema import SchemaConverter
 from apcore_a2a.server.executor import ApCoreAgentExecutor
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -42,7 +42,7 @@ async def _drain_queue(event_queue: EventQueue) -> list:
             if event is None:
                 break
             events.append(event)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             break
     return events
 
@@ -141,7 +141,7 @@ async def test_execute_unknown_skill_enqueues_failed(apcore_executor):
 
 async def test_execute_timeout_enqueues_failed(apcore_executor, mock_executor):
     """asyncio.TimeoutError → failed event."""
-    mock_executor.call_async = AsyncMock(side_effect=asyncio.TimeoutError())
+    mock_executor.call_async = AsyncMock(side_effect=TimeoutError())
     ctx = _make_context(skill_id="image.resize", text='{"width": 800}')
     queue = await _make_queue()
 
@@ -251,7 +251,7 @@ async def test_on_state_change_called_on_missing_skill_id(mock_executor, mock_re
 
 async def test_on_state_change_called_on_timeout(mock_executor, mock_registry):
     """T1: on_state_change receives (working→failed) on timeout."""
-    mock_executor.call_async = AsyncMock(side_effect=asyncio.TimeoutError())
+    mock_executor.call_async = AsyncMock(side_effect=TimeoutError())
     calls: list[tuple[str, str]] = []
     executor = ApCoreAgentExecutor(
         mock_executor,
@@ -261,7 +261,7 @@ async def test_on_state_change_called_on_timeout(mock_executor, mock_registry):
         execution_timeout=5,
         on_state_change=lambda old, new: calls.append((old, new)),
     )
-    ctx = _make_context(skill_id="image.resize", text='{}')
+    ctx = _make_context(skill_id="image.resize", text="{}")
     queue = await _make_queue()
 
     await executor.execute(ctx, queue)
@@ -285,7 +285,7 @@ async def test_on_state_change_called_on_approval_pending(mock_executor, mock_re
         execution_timeout=5,
         on_state_change=lambda old, new: calls.append((old, new)),
     )
-    ctx = _make_context(skill_id="image.resize", text='{}')
+    ctx = _make_context(skill_id="image.resize", text="{}")
     queue = await _make_queue()
 
     await executor.execute(ctx, queue)
@@ -303,7 +303,7 @@ async def test_on_state_change_not_called_when_none(mock_executor, mock_registry
         execution_timeout=5,
         # on_state_change defaults to None
     )
-    ctx = _make_context(skill_id="image.resize", text='{}')
+    ctx = _make_context(skill_id="image.resize", text="{}")
     queue = await _make_queue()
     # Must not raise
     await executor.execute(ctx, queue)

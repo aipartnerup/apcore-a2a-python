@@ -1,6 +1,8 @@
 """Tests for SkillMapper."""
+
 import pytest
 from a2a.types import AgentSkill
+
 from apcore_a2a.adapters.skill_mapper import SkillMapper
 from tests.conftest import ModuleDescriptor, ModuleExample
 
@@ -89,6 +91,7 @@ def test_humanize_single_word(mapper):
 
 
 # --- _build_extensions ---
+
 
 def test_build_extensions_returns_none_when_annotations_none(mapper):
     assert mapper._build_extensions(None) is None

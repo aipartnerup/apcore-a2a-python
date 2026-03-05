@@ -1,6 +1,8 @@
 """A2AServerFactory: wires all components into a Starlette ASGI app via a2a-sdk."""
+
 from __future__ import annotations
 
+import contextlib
 import logging
 import time
 import warnings
@@ -14,7 +16,7 @@ from a2a.server.tasks.inmemory_push_notification_config_store import (
     InMemoryPushNotificationConfigStore,
 )
 from a2a.server.tasks.inmemory_task_store import InMemoryTaskStore as A2ATaskStore
-from a2a.types import AgentCard, AgentCapabilities
+from a2a.types import AgentCapabilities, AgentCard
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -72,18 +74,14 @@ class _MetricsState:
             self.input_required_tasks += 1
 
 
-def _build_health_handler(
-    task_store: Any, registry: Any, metrics: _MetricsState, version: str
-) -> Any:
+def _build_health_handler(task_store: Any, registry: Any, metrics: _MetricsState, version: str) -> Any:
     """Return a Starlette endpoint that serves /health."""
 
     async def handle_health(request: Request) -> JSONResponse:
         module_count = 0
         if registry is not None:
-            try:
+            with contextlib.suppress(Exception):
                 module_count = len(registry.list())
-            except Exception:
-                pass
 
         # Probe the store
         try:
@@ -234,9 +232,7 @@ class A2AServerFactory:
         self._task_store = sdk_task_store
 
         # Build push config store
-        push_config_store = (
-            InMemoryPushNotificationConfigStore() if push_notifications else None
-        )
+        push_config_store = InMemoryPushNotificationConfigStore() if push_notifications else None
 
         # Build DefaultRequestHandler
         handler = DefaultRequestHandler(
@@ -287,18 +283,14 @@ class A2AServerFactory:
 
         if metrics:
             metrics_handler = _build_metrics_handler(metrics_state)
-            custom_routes.append(
-                Route("/metrics", endpoint=metrics_handler, methods=["GET"])
-            )
+            custom_routes.append(Route("/metrics", endpoint=metrics_handler, methods=["GET"]))
 
         if explorer:
             try:
                 from apcore_a2a.explorer import create_explorer_mount  # type: ignore[import]
 
                 # D3: pass handler so explorer has access to the request handler
-                explorer_mount = create_explorer_mount(
-                    agent_card, handler, explorer_prefix=explorer_prefix
-                )
+                explorer_mount = create_explorer_mount(agent_card, handler, explorer_prefix=explorer_prefix)
                 custom_routes.append(explorer_mount)
             except Exception:
                 logger.warning("Explorer not available", exc_info=True)

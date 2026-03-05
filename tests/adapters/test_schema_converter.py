@@ -1,5 +1,7 @@
 """Tests for SchemaConverter."""
+
 import pytest
+
 from apcore_a2a.adapters.schema import SchemaConverter
 from tests.conftest import ModuleDescriptor
 
@@ -10,6 +12,7 @@ def converter():
 
 
 # convert_input_schema
+
 
 def test_none_schema_returns_empty_object(converter):
     desc = ModuleDescriptor(input_schema=None)
@@ -70,6 +73,7 @@ def test_schema_without_type_gets_object(converter):
 
 
 # convert_output_schema
+
 
 def test_output_none_schema(converter):
     desc = ModuleDescriptor(output_schema=None)

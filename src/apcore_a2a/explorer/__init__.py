@@ -1,4 +1,5 @@
 """Explorer: browser-based A2A agent UI."""
+
 from __future__ import annotations
 
 from pathlib import Path

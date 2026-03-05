@@ -1,17 +1,20 @@
 """A2AClient: HTTP client for remote A2A agents."""
+
 from __future__ import annotations
+
 import json
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 from urllib.parse import urlparse
 from uuid import uuid4
+
 import httpx
+
 from apcore_a2a.client.card_fetcher import AgentCardFetcher
 from apcore_a2a.client.exceptions import (
-    A2AClientError,
     A2AConnectionError,
-    TaskNotFoundError,
-    TaskNotCancelableError,
     A2AServerError,
+    TaskNotCancelableError,
+    TaskNotFoundError,
 )
 
 _JSONRPC_ERRORS = {
@@ -156,7 +159,7 @@ class A2AClient:
         """Close the underlying HTTP client."""
         await self._http.aclose()
 
-    async def __aenter__(self) -> "A2AClient":
+    async def __aenter__(self) -> A2AClient:
         return self
 
     async def __aexit__(self, *args: object) -> None:

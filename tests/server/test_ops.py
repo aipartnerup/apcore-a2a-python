@@ -1,15 +1,13 @@
 """Tests for ops endpoints (Health/Metrics/Dynamic Registration) — factory-based."""
+
 from __future__ import annotations
 
 import json
 from unittest.mock import AsyncMock, MagicMock
 
-import pytest
 from starlette.testclient import TestClient
 
-from a2a.server.tasks.inmemory_task_store import InMemoryTaskStore
 from apcore_a2a.server.factory import A2AServerFactory
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -102,6 +100,7 @@ def test_health_unhealthy_503():
 def test_health_exempt_paths_in_factory_source():
     """The factory source references /health and exempt_paths."""
     import inspect
+
     import apcore_a2a.server.factory as factory_module
 
     source = inspect.getsource(factory_module)
@@ -129,8 +128,15 @@ def test_metrics_enabled_returns_200():
 def test_metrics_has_expected_fields():
     app, _ = make_app(metrics=True)
     data = TestClient(app).get("/metrics").json()
-    for field in ("active_tasks", "completed_tasks", "failed_tasks",
-                  "canceled_tasks", "input_required_tasks", "total_requests", "uptime_seconds"):
+    for field in (
+        "active_tasks",
+        "completed_tasks",
+        "failed_tasks",
+        "canceled_tasks",
+        "input_required_tasks",
+        "total_requests",
+        "uptime_seconds",
+    ):
         assert field in data, f"Missing field: {field}"
 
 
@@ -150,10 +156,14 @@ def test_metrics_requests_counter():
     app, _ = make_app(metrics=True)
     client = TestClient(app)
     for i in range(3):
-        body = json.dumps({
-            "jsonrpc": "2.0", "id": f"req-{i}",
-            "method": "tasks/list", "params": {},
-        })
+        body = json.dumps(
+            {
+                "jsonrpc": "2.0",
+                "id": f"req-{i}",
+                "method": "tasks/list",
+                "params": {},
+            }
+        )
         client.post("/", content=body, headers={"Content-Type": "application/json"})
 
     data = client.get("/metrics").json()
@@ -194,6 +204,7 @@ def test_register_module_invalidates_cache():
 
 def test_register_module_logs_info(caplog):
     import logging
+
     factory = A2AServerFactory()
     reg = make_registry()
     factory.create(reg, make_executor(), name="Agent", description="d", version="1", url="http://x")

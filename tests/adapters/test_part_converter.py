@@ -1,6 +1,8 @@
 """Tests for PartConverter."""
+
 import pytest
 from a2a.types import Artifact, DataPart, Part, TextPart
+
 from apcore_a2a.adapters.parts import PartConverter
 from apcore_a2a.adapters.schema import SchemaConverter
 
@@ -23,6 +25,7 @@ def _data_part(data: dict) -> Part:
 
 
 # parts_to_input
+
 
 def test_text_part_returns_string(converter):
     parts = [_text_part("resize to 800x600")]
@@ -48,6 +51,7 @@ def test_multiple_parts_raises(converter):
 
 
 # output_to_parts
+
 
 def test_string_output_returns_artifact_with_text_part(converter):
     artifact = converter.output_to_parts("hello world")
@@ -90,6 +94,7 @@ def test_list_output_returns_json_text_part(converter):
     root = artifact.parts[0].root
     assert isinstance(root, TextPart)
     import json
+
     assert json.loads(root.text) == [1, 2, 3]
 
 
@@ -99,5 +104,6 @@ def test_list_output_not_python_repr(converter):
     text = artifact.parts[0].root.text
     # JSON uses double quotes; Python repr uses single quotes
     import json
+
     parsed = json.loads(text)
     assert parsed == ["a", "b"]

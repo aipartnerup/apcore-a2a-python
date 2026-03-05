@@ -6,16 +6,14 @@ asyncio_mode = "auto" is set in pyproject.toml so all async tests run natively.
 
 from __future__ import annotations
 
-import pytest
 from dataclasses import dataclass, field
 from typing import Any
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
+import pytest
+from a2a.server.tasks.inmemory_task_store import InMemoryTaskStore
 from starlette.applications import Starlette
 from starlette.testclient import TestClient
-
-from a2a.server.tasks.inmemory_task_store import InMemoryTaskStore
-
 
 # ---------------------------------------------------------------------------
 # Minimal ModuleDescriptor stub (mirrors conftest.py)
@@ -64,6 +62,7 @@ def make_mock_registry(modules=None, config=None):
     class _RegistrySpec:
         def list(self): ...
         def get_definition(self, module_id): ...
+
         config: dict
 
     registry = MagicMock(spec=_RegistrySpec)
@@ -81,6 +80,7 @@ def make_mock_executor(registry=None):
     # Use spec to control exposed attributes
     class _ExecutorSpec:
         async def call_async(self, *args, **kwargs): ...
+
         registry: Any
 
     executor = MagicMock(spec=_ExecutorSpec)
@@ -165,6 +165,7 @@ async def test_async_serve_default_task_store_is_in_memory():
         return original_create(self, reg, exc, task_store=task_store, **kwargs)
 
     import apcore_a2a._serve as serve_module
+
     original_factory_class = serve_module.A2AServerFactory
 
     class CapturingFactory(A2AServerFactory):
@@ -184,8 +185,9 @@ async def test_async_serve_default_task_store_is_in_memory():
 
 async def test_async_serve_name_resolution_kwarg():
     """name kwarg takes priority over registry config."""
-    from apcore_a2a import async_serve
     from starlette.testclient import TestClient
+
+    from apcore_a2a import async_serve
 
     config = {"project": {"name": "registry-name", "version": "2.0.0"}}
     registry = make_mock_registry(config=config)
@@ -200,8 +202,9 @@ async def test_async_serve_name_resolution_kwarg():
 
 async def test_async_serve_name_resolution_registry_config():
     """name falls back to registry.config['project']['name']."""
-    from apcore_a2a import async_serve
     from starlette.testclient import TestClient
+
+    from apcore_a2a import async_serve
 
     config = {"project": {"name": "config-agent", "version": "3.0.0"}}
     registry = make_mock_registry(config=config)
@@ -216,8 +219,9 @@ async def test_async_serve_name_resolution_registry_config():
 
 async def test_async_serve_name_resolution_fallback():
     """No kwarg, no registry config → name defaults to 'apcore-agent'."""
-    from apcore_a2a import async_serve
     from starlette.testclient import TestClient
+
+    from apcore_a2a import async_serve
 
     registry = make_mock_registry(config={})
     app = await async_serve(registry)
@@ -230,8 +234,9 @@ async def test_async_serve_name_resolution_fallback():
 
 async def test_async_serve_version_fallback():
     """No kwarg, no registry config → version defaults to '0.0.0'."""
-    from apcore_a2a import async_serve
     from starlette.testclient import TestClient
+
+    from apcore_a2a import async_serve
 
     registry = make_mock_registry(config={})
     app = await async_serve(registry)
@@ -244,8 +249,9 @@ async def test_async_serve_version_fallback():
 
 async def test_async_serve_description_fallback():
     """No kwarg, no registry config → description includes 'skills'."""
-    from apcore_a2a import async_serve
     from starlette.testclient import TestClient
+
+    from apcore_a2a import async_serve
 
     registry = make_mock_registry(config={})
     app = await async_serve(registry)
@@ -258,8 +264,9 @@ async def test_async_serve_description_fallback():
 
 async def test_async_serve_url_default():
     """url defaults to 'http://localhost:8000' when not provided."""
-    from apcore_a2a import async_serve
     from starlette.testclient import TestClient
+
+    from apcore_a2a import async_serve
 
     registry = make_mock_registry()
     app = await async_serve(registry)
@@ -272,8 +279,9 @@ async def test_async_serve_url_default():
 
 async def test_async_serve_url_kwarg():
     """Custom url kwarg is used in agent card."""
-    from apcore_a2a import async_serve
     from starlette.testclient import TestClient
+
+    from apcore_a2a import async_serve
 
     registry = make_mock_registry()
     app = await async_serve(registry, url="https://myagent.example.com")

@@ -10,10 +10,10 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 # JSON-RPC error codes
-_CODE_METHOD_NOT_FOUND = -32601   # Skill/module not found
-_CODE_INVALID_PARAMS = -32602     # Schema validation / invalid input
-_CODE_INTERNAL_ERROR = -32603     # Internal / timeout / safety errors
-_CODE_TASK_NOT_FOUND = -32001     # ACL denied (masked as "not found")
+_CODE_METHOD_NOT_FOUND = -32601  # Skill/module not found
+_CODE_INVALID_PARAMS = -32602  # Schema validation / invalid input
+_CODE_INTERNAL_ERROR = -32603  # Internal / timeout / safety errors
+_CODE_TASK_NOT_FOUND = -32001  # ACL denied (masked as "not found")
 
 
 class ErrorMapper:
@@ -93,4 +93,3 @@ class ErrorMapper:
         # Match Unix absolute paths (single or multi-component) and ~ paths
         message = re.sub(r"~?/[^\s]*", "", message).strip()
         return message[:500]
-

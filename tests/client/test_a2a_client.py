@@ -1,13 +1,21 @@
 """Tests for A2AClient."""
+
 from __future__ import annotations
-import json
-import pytest
+
 from unittest.mock import AsyncMock, MagicMock, patch
-from apcore_a2a.client.exceptions import (
-    A2AClientError, A2AConnectionError, A2ADiscoveryError,
-    TaskNotFoundError, TaskNotCancelableError, A2AServerError
-)
+
+import pytest
+
 from apcore_a2a.client.client import A2AClient
+from apcore_a2a.client.exceptions import (
+    A2AClientError,
+    A2AConnectionError,
+    A2ADiscoveryError,
+    A2AServerError,
+    TaskNotCancelableError,
+    TaskNotFoundError,
+)
+
 
 # --- Exception hierarchy ---
 def test_exception_hierarchy():
@@ -17,26 +25,32 @@ def test_exception_hierarchy():
     assert issubclass(TaskNotCancelableError, A2AClientError)
     assert issubclass(A2AServerError, A2AClientError)
 
+
 # --- URL validation ---
 def test_invalid_url_raises_value_error():
     with pytest.raises(ValueError):
         A2AClient("not-a-url")
 
+
 def test_http_url_valid():
     client = A2AClient("http://localhost:8000")
     assert client._url == "http://localhost:8000"
+
 
 def test_https_url_valid():
     client = A2AClient("https://agent.example.com")
     assert client._url == "https://agent.example.com"
 
+
 def test_trailing_slash_stripped():
     client = A2AClient("http://localhost:8000/")
     assert client._url == "http://localhost:8000"
 
+
 def test_ftp_url_raises_value_error():
     with pytest.raises(ValueError):
         A2AClient("ftp://example.com")
+
 
 # --- send_message ---
 @pytest.fixture
@@ -44,6 +58,7 @@ def mock_http():
     """Mock httpx.AsyncClient."""
     http = MagicMock()
     return http
+
 
 @pytest.fixture
 def task_dict():
@@ -56,13 +71,13 @@ def task_dict():
         "kind": "task",
     }
 
+
 async def test_send_message_success(task_dict):
     response = MagicMock()
     response.status_code = 200
     response.json.return_value = {"jsonrpc": "2.0", "id": "1", "result": task_dict}
     response.raise_for_status = MagicMock()
 
-    import httpx
     with patch("httpx.AsyncClient") as mock_cls:
         mock_inst = AsyncMock()
         mock_inst.post = AsyncMock(return_value=response)
@@ -75,13 +90,13 @@ async def test_send_message_success(task_dict):
         )
         assert result == task_dict
 
+
 async def test_send_message_rpc_error_task_not_found():
     response = MagicMock()
     response.status_code = 200
     response.json.return_value = {"jsonrpc": "2.0", "id": "1", "error": {"code": -32001, "message": "Task not found"}}
     response.raise_for_status = MagicMock()
 
-    import httpx
     with patch("httpx.AsyncClient") as mock_cls:
         mock_inst = AsyncMock()
         mock_inst.post = AsyncMock(return_value=response)
@@ -94,13 +109,13 @@ async def test_send_message_rpc_error_task_not_found():
                 metadata={"skillId": "x"},
             )
 
+
 async def test_send_message_rpc_error_not_cancelable():
     response = MagicMock()
     response.status_code = 200
     response.json.return_value = {"jsonrpc": "2.0", "id": "1", "error": {"code": -32002, "message": "Not cancelable"}}
     response.raise_for_status = MagicMock()
 
-    import httpx
     with patch("httpx.AsyncClient") as mock_cls:
         mock_inst = AsyncMock()
         mock_inst.post = AsyncMock(return_value=response)
@@ -110,8 +125,10 @@ async def test_send_message_rpc_error_not_cancelable():
         with pytest.raises(TaskNotCancelableError):
             await client.cancel_task("task-1")
 
+
 async def test_send_message_connection_error():
     import httpx
+
     with patch("httpx.AsyncClient") as mock_cls:
         mock_inst = AsyncMock()
         mock_inst.post = AsyncMock(side_effect=httpx.ConnectError("refused"))
@@ -124,6 +141,7 @@ async def test_send_message_connection_error():
                 metadata={"skillId": "x"},
             )
 
+
 # --- get_task ---
 async def test_get_task_success(task_dict):
     response = MagicMock()
@@ -131,7 +149,6 @@ async def test_get_task_success(task_dict):
     response.json.return_value = {"jsonrpc": "2.0", "id": "1", "result": task_dict}
     response.raise_for_status = MagicMock()
 
-    import httpx
     with patch("httpx.AsyncClient") as mock_cls:
         mock_inst = AsyncMock()
         mock_inst.post = AsyncMock(return_value=response)
@@ -141,28 +158,28 @@ async def test_get_task_success(task_dict):
         result = await client.get_task("task-1")
         assert result == task_dict
 
+
 # --- context manager ---
 async def test_context_manager_close():
-    import httpx
     with patch("httpx.AsyncClient") as mock_cls:
         mock_inst = AsyncMock()
         mock_cls.return_value = mock_inst
 
-        async with A2AClient("http://localhost:8000") as client:
+        async with A2AClient("http://localhost:8000"):
             pass
         mock_inst.aclose.assert_called_once()
 
+
 # --- auth header ---
 def test_auth_header_set():
-    import httpx
     with patch("httpx.AsyncClient") as mock_cls:
         A2AClient("http://localhost:8000", auth="Bearer mytoken")
         call_kwargs = mock_cls.call_args[1]
         headers = call_kwargs.get("headers", {})
         assert headers.get("Authorization") == "Bearer mytoken"
 
+
 def test_no_auth_no_header():
-    import httpx
     with patch("httpx.AsyncClient") as mock_cls:
         mock_cls.return_value = MagicMock()
         A2AClient("http://localhost:8000")
@@ -173,11 +190,10 @@ def test_no_auth_no_header():
 
 # --- stream_message --- (T4)
 
+
 async def test_stream_message_yields_events_and_terminates_on_final():
     """T4: stream_message yields events and stops when final=true is received."""
-    import httpx
-    from unittest.mock import AsyncMock, MagicMock, patch
-    import json
+    from unittest.mock import MagicMock, patch
 
     # Build fake SSE lines: two events, second has final=true
     lines = [
@@ -195,10 +211,12 @@ async def test_stream_message_yields_events_and_terminates_on_final():
 
     def _fake_stream(*args, **kwargs):
         class _CM:
-            async def __aenter__(self_cm):
+            async def __aenter__(self):
                 return mock_response
-            async def __aexit__(self_cm, *exc):
+
+            async def __aexit__(self, *exc):
                 pass
+
         return _CM()
 
     with patch("httpx.AsyncClient") as mock_cls:
@@ -217,7 +235,6 @@ async def test_stream_message_yields_events_and_terminates_on_final():
 
 async def test_stream_message_terminates_on_final_in_result_envelope():
     """T4: stream_message stops when final=true is nested inside a result envelope."""
-    import json
 
     lines = [
         'data: {"jsonrpc":"2.0","id":"1","result":{"type":"TaskStatusUpdateEvent","final":true}}',
@@ -232,10 +249,12 @@ async def test_stream_message_terminates_on_final_in_result_envelope():
 
     def _fake_stream(*args, **kwargs):
         class _CM:
-            async def __aenter__(self_cm):
+            async def __aenter__(self):
                 return mock_response
-            async def __aexit__(self_cm, *exc):
+
+            async def __aexit__(self, *exc):
                 pass
+
         return _CM()
 
     with patch("httpx.AsyncClient") as mock_cls:

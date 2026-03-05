@@ -1,6 +1,7 @@
 """Tests for ErrorMapper."""
-import asyncio
+
 import pytest
+
 from apcore_a2a.adapters.errors import ErrorMapper
 
 
@@ -24,7 +25,7 @@ def test_generic_exception(mapper):
 
 
 def test_timeout_error(mapper):
-    result = mapper.to_jsonrpc_error(asyncio.TimeoutError())
+    result = mapper.to_jsonrpc_error(TimeoutError())
     assert result["code"] == -32603
     assert "timeout" in result["message"].lower()
 
@@ -71,5 +72,3 @@ def test_sanitize_message_truncates(mapper):
     long_msg = "x" * 600
     result = mapper._sanitize_message(long_msg)
     assert len(result) <= 500
-
-

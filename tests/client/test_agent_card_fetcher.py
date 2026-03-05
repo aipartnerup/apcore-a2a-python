@@ -1,16 +1,20 @@
 """Tests for AgentCardFetcher."""
-import time
-import pytest
+
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
+
 from apcore_a2a.client.card_fetcher import AgentCardFetcher
 from apcore_a2a.client.exceptions import A2ADiscoveryError
 
 AGENT_CARD = {"name": "Test Agent", "version": "1.0.0", "skills": []}
 
+
 @pytest.fixture
 def mock_http():
     http = MagicMock()
     return http
+
 
 async def test_fetch_success(mock_http):
     response = MagicMock()
@@ -22,6 +26,7 @@ async def test_fetch_success(mock_http):
     result = await fetcher.fetch()
     assert result == AGENT_CARD
 
+
 async def test_fetch_http_error_raises(mock_http):
     response = MagicMock()
     response.status_code = 404
@@ -30,6 +35,7 @@ async def test_fetch_http_error_raises(mock_http):
     fetcher = AgentCardFetcher(mock_http, "http://localhost:8000")
     with pytest.raises(A2ADiscoveryError, match="404"):
         await fetcher.fetch()
+
 
 async def test_fetch_invalid_json_raises(mock_http):
     response = MagicMock()
@@ -40,6 +46,7 @@ async def test_fetch_invalid_json_raises(mock_http):
     fetcher = AgentCardFetcher(mock_http, "http://localhost:8000")
     with pytest.raises(A2ADiscoveryError):
         await fetcher.fetch()
+
 
 async def test_fetch_uses_cache_within_ttl(mock_http):
     response = MagicMock()
@@ -54,6 +61,7 @@ async def test_fetch_uses_cache_within_ttl(mock_http):
     assert mock_http.get.call_count == 1
     assert result1 == result2
 
+
 async def test_fetch_refreshes_after_ttl(mock_http):
     response = MagicMock()
     response.status_code = 200
@@ -65,6 +73,7 @@ async def test_fetch_refreshes_after_ttl(mock_http):
     await fetcher.fetch()
     await fetcher.fetch()
     assert mock_http.get.call_count == 2
+
 
 async def test_correct_url_used(mock_http):
     response = MagicMock()

@@ -5,13 +5,11 @@ All stubs are pure Python dataclasses — no apcore dependency needed for unit t
 
 from __future__ import annotations
 
-import asyncio
 from dataclasses import dataclass, field
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-
 
 # ---------------------------------------------------------------------------
 # apcore stub types (mirrors apcore-mcp-python/tests/conftest.py pattern)

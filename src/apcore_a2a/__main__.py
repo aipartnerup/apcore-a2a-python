@@ -102,6 +102,7 @@ def _run_serve(args: argparse.Namespace) -> None:
     # Warn when binding to all interfaces without auth
     if args.host == "0.0.0.0" and auth is None:
         import logging
+
         logging.getLogger(__name__).warning(
             "--host 0.0.0.0 binds to all network interfaces without authentication; "
             "consider using --host 127.0.0.1 or enabling --auth-type bearer"

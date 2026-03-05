@@ -1,7 +1,11 @@
 """AgentCardFetcher: TTL-cached Agent Card discovery."""
+
 from __future__ import annotations
+
 import time
+
 import httpx
+
 from apcore_a2a.client.exceptions import A2ADiscoveryError
 
 
@@ -33,9 +37,7 @@ class AgentCardFetcher:
             return self._cached
         response = await self._http.get(self._url)
         if response.status_code != 200:
-            raise A2ADiscoveryError(
-                f"Agent Card fetch failed: HTTP {response.status_code} from {self._url}"
-            )
+            raise A2ADiscoveryError(f"Agent Card fetch failed: HTTP {response.status_code} from {self._url}")
         try:
             card = response.json()
         except Exception as e:

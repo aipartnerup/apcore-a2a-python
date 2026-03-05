@@ -1,10 +1,12 @@
 """Tests for AgentCardBuilder."""
-import pytest
+
 from unittest.mock import MagicMock
-from a2a.types import AgentCard, AgentCapabilities
+
+import pytest
+from a2a.types import AgentCapabilities, AgentCard
+
 from apcore_a2a.adapters.agent_card import AgentCardBuilder
 from apcore_a2a.adapters.skill_mapper import SkillMapper
-from tests.conftest import ModuleDescriptor
 
 
 @pytest.fixture
@@ -71,7 +73,10 @@ def test_build_security_schemes_added(builder, mock_registry, capabilities):
     schemes = {"bearerAuth": {"type": "http", "scheme": "bearer"}}
     card = builder.build(
         mock_registry,
-        name="A", description="B", version="1", url="http://x",
+        name="A",
+        description="B",
+        version="1",
+        url="http://x",
         capabilities=capabilities,
         security_schemes=schemes,
     )
@@ -82,7 +87,10 @@ def test_build_security_schemes_added(builder, mock_registry, capabilities):
 def test_build_no_security_schemes_when_none(builder, mock_registry, capabilities):
     card = builder.build(
         mock_registry,
-        name="A", description="B", version="1", url="http://x",
+        name="A",
+        description="B",
+        version="1",
+        url="http://x",
         capabilities=capabilities,
     )
     assert card.security_schemes is None
@@ -92,7 +100,10 @@ def test_build_no_security_schemes_when_none(builder, mock_registry, capabilitie
 def test_build_default_io_modes(builder, mock_registry, capabilities):
     card = builder.build(
         mock_registry,
-        name="A", description="B", version="1", url="http://x",
+        name="A",
+        description="B",
+        version="1",
+        url="http://x",
         capabilities=capabilities,
     )
     assert "text/plain" in card.default_input_modes
@@ -102,7 +113,10 @@ def test_build_default_io_modes(builder, mock_registry, capabilities):
 def test_invalidate_cache(builder, mock_registry, capabilities):
     base = builder.build(
         mock_registry,
-        name="A", description="B", version="1", url="http://x",
+        name="A",
+        description="B",
+        version="1",
+        url="http://x",
         capabilities=capabilities,
     )
     builder._cached_extended_card = builder.build_extended(base_card=base)
@@ -114,7 +128,10 @@ def test_invalidate_cache(builder, mock_registry, capabilities):
 def test_build_extended_returns_agent_card(builder, mock_registry, capabilities):
     base = builder.build(
         mock_registry,
-        name="A", description="B", version="1", url="http://x",
+        name="A",
+        description="B",
+        version="1",
+        url="http://x",
         capabilities=capabilities,
     )
     extended = builder.build_extended(base_card=base)

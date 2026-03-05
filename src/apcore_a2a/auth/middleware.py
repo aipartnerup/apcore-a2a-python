@@ -1,4 +1,5 @@
 """ASGI middleware that bridges HTTP authentication to A2A via ContextVar."""
+
 from __future__ import annotations
 
 import json
@@ -49,8 +50,7 @@ class AuthMiddleware:
         self._app = app
         self._authenticator = authenticator
         self._exempt_paths = (
-            exempt_paths if exempt_paths is not None
-            else {"/.well-known/agent.json", "/health", "/metrics"}
+            exempt_paths if exempt_paths is not None else {"/.well-known/agent.json", "/health", "/metrics"}
         )
         self._exempt_prefixes = exempt_prefixes or set()
         self._require_auth = require_auth
@@ -78,9 +78,7 @@ class AuthMiddleware:
             method = scope.get("method", "UNKNOWN")
             client = scope.get("client")
             remote = f"{client[0]}:{client[1]}" if client else "unknown"
-            logger.warning(
-                "Authentication failed: method=%s path=%s remote=%s", method, path, remote
-            )
+            logger.warning("Authentication failed: method=%s path=%s remote=%s", method, path, remote)
             await self._send_401(send)
             return
 

@@ -7,9 +7,8 @@ import logging
 import os
 from typing import Any
 
-from starlette.applications import Starlette
-
 from a2a.server.tasks.inmemory_task_store import InMemoryTaskStore
+from starlette.applications import Starlette
 
 from apcore_a2a.server.factory import A2AServerFactory
 
@@ -56,9 +55,7 @@ def _resolve_registry_and_executor(
         executor = registry_or_executor
         registry = getattr(executor, "registry", None)
         if registry is None:
-            raise TypeError(
-                "Expected apcore Registry or Executor: executor has no .registry attribute"
-            )
+            raise TypeError("Expected apcore Registry or Executor: executor has no .registry attribute")
         return registry, executor
 
     if has_list and has_get_def:
@@ -125,21 +122,15 @@ async def async_serve(
     # Step 2: Validate registry has at least one module
     modules = registry.list()
     if len(modules) == 0:
-        raise ValueError(
-            "Registry contains zero modules; at least one module is required to serve an A2A agent"
-        )
+        raise ValueError("Registry contains zero modules; at least one module is required to serve an A2A agent")
 
     # Step 3: Resolve metadata with fallbacks
-    project_config: dict[str, Any] = (
-        getattr(registry, "config", {}) or {}
-    ).get("project", {}) or {}
+    project_config: dict[str, Any] = (getattr(registry, "config", {}) or {}).get("project", {}) or {}
 
     resolved_name = name or project_config.get("name") or "apcore-agent"
     resolved_version = version or project_config.get("version") or "0.0.0"
     resolved_description = (
-        description
-        or project_config.get("description")
-        or f"apcore agent with {len(modules)} skills"
+        description or project_config.get("description") or f"apcore agent with {len(modules)} skills"
     )
 
     # Step 4: Default task_store to InMemoryTaskStore if not provided
@@ -150,15 +141,11 @@ async def async_serve(
     if auth is not None:
         missing_auth = [m for m in _AUTH_REQUIRED if not hasattr(auth, m)]
         if missing_auth:
-            raise TypeError(
-                f"auth missing required methods: {missing_auth}"
-            )
+            raise TypeError(f"auth missing required methods: {missing_auth}")
 
     missing_store = [m for m in _TASK_STORE_REQUIRED if not hasattr(task_store, m)]
     if missing_store:
-        raise TypeError(
-            f"task_store missing required methods: {missing_store}"
-        )
+        raise TypeError(f"task_store missing required methods: {missing_store}")
 
     # Step 6: Build the ASGI app via A2AServerFactory
     factory = A2AServerFactory()

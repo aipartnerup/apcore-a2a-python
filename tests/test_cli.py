@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import os
 from argparse import Namespace
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-from apcore_a2a.__main__ import _resolve_auth_key, main, _run_serve
-
+from apcore_a2a.__main__ import _resolve_auth_key, _run_serve, main
 
 # ---------------------------------------------------------------------------
 # main() — top-level tests
@@ -96,10 +94,10 @@ def test_serve_zero_modules_exits_1(tmp_path, capsys):
         log_level="info",
     )
 
-    with patch("apcore.Registry") as MockRegistry:
+    with patch("apcore.Registry") as mock_registry_cls:
         mock_reg = MagicMock()
         mock_reg.list.return_value = []
-        MockRegistry.return_value = mock_reg
+        mock_registry_cls.return_value = mock_reg
 
         with pytest.raises(SystemExit) as exc_info:
             _run_serve(args)
@@ -141,10 +139,10 @@ def test_serve_auth_bearer_missing_key_exits_1(tmp_path, capsys, monkeypatch):
         log_level="info",
     )
 
-    with patch("apcore.Registry") as MockRegistry:
+    with patch("apcore.Registry") as mock_registry_cls:
         mock_reg = MagicMock()
         mock_reg.list.return_value = ["my.module"]
-        MockRegistry.return_value = mock_reg
+        mock_registry_cls.return_value = mock_reg
 
         with pytest.raises(SystemExit) as exc_info:
             _run_serve(args)
@@ -178,11 +176,10 @@ def test_serve_auth_bearer_with_key(tmp_path, monkeypatch):
         log_level="info",
     )
 
-    with patch("apcore.Registry") as MockRegistry, \
-         patch("apcore_a2a.serve") as mock_serve:
+    with patch("apcore.Registry") as mock_registry_cls, patch("apcore_a2a.serve") as mock_serve:
         mock_reg = MagicMock()
         mock_reg.list.return_value = ["my.module"]
-        MockRegistry.return_value = mock_reg
+        mock_registry_cls.return_value = mock_reg
 
         _run_serve(args)
 
@@ -215,11 +212,10 @@ def test_serve_auth_bearer_with_jwt_secret_env(tmp_path, monkeypatch, capsys):
         log_level="info",
     )
 
-    with patch("apcore.Registry") as MockRegistry, \
-         patch("apcore_a2a.serve") as mock_serve:
+    with patch("apcore.Registry") as mock_registry_cls, patch("apcore_a2a.serve") as mock_serve:
         mock_reg = MagicMock()
         mock_reg.list.return_value = ["my.module"]
-        MockRegistry.return_value = mock_reg
+        mock_registry_cls.return_value = mock_reg
 
         _run_serve(args)
 
@@ -255,11 +251,10 @@ def test_serve_runtime_error_exits_2(tmp_path, capsys):
         log_level="info",
     )
 
-    with patch("apcore.Registry") as MockRegistry, \
-         patch("apcore_a2a.serve") as mock_serve:
+    with patch("apcore.Registry") as mock_registry_cls, patch("apcore_a2a.serve") as mock_serve:
         mock_reg = MagicMock()
         mock_reg.list.return_value = ["my.module"]
-        MockRegistry.return_value = mock_reg
+        mock_registry_cls.return_value = mock_reg
         mock_serve.side_effect = RuntimeError("something went wrong")
 
         with pytest.raises(SystemExit) as exc_info:
@@ -294,11 +289,10 @@ def test_serve_keyboard_interrupt_exits_0(tmp_path):
         log_level="info",
     )
 
-    with patch("apcore.Registry") as MockRegistry, \
-         patch("apcore_a2a.serve") as mock_serve:
+    with patch("apcore.Registry") as mock_registry_cls, patch("apcore_a2a.serve") as mock_serve:
         mock_reg = MagicMock()
         mock_reg.list.return_value = ["my.module"]
-        MockRegistry.return_value = mock_reg
+        mock_registry_cls.return_value = mock_reg
         mock_serve.side_effect = KeyboardInterrupt()
 
         with pytest.raises(SystemExit) as exc_info:
@@ -335,11 +329,10 @@ def test_serve_calls_serve_with_correct_args(tmp_path):
         log_level="debug",
     )
 
-    with patch("apcore.Registry") as MockRegistry, \
-         patch("apcore_a2a.serve") as mock_serve:
+    with patch("apcore.Registry") as mock_registry_cls, patch("apcore_a2a.serve") as mock_serve:
         mock_reg = MagicMock()
         mock_reg.list.return_value = ["my.module", "other.module"]
-        MockRegistry.return_value = mock_reg
+        mock_registry_cls.return_value = mock_reg
 
         _run_serve(args)
 
@@ -388,11 +381,10 @@ def test_serve_default_url_constructed_from_host_port(tmp_path):
         log_level="info",
     )
 
-    with patch("apcore.Registry") as MockRegistry, \
-         patch("apcore_a2a.serve") as mock_serve:
+    with patch("apcore.Registry") as mock_registry_cls, patch("apcore_a2a.serve") as mock_serve:
         mock_reg = MagicMock()
         mock_reg.list.return_value = ["my.module"]
-        MockRegistry.return_value = mock_reg
+        mock_registry_cls.return_value = mock_reg
 
         _run_serve(args)
 

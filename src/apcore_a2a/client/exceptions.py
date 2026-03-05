@@ -1,4 +1,5 @@
 """Client-side exceptions for A2A operations."""
+
 from __future__ import annotations
 
 

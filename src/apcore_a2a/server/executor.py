@@ -1,18 +1,18 @@
 """ApCoreAgentExecutor: bridges apcore execution to the a2a-sdk AgentExecutor ABC."""
+
 from __future__ import annotations
 
 import asyncio
 import inspect
 import logging
 from collections.abc import Callable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
 from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events import EventQueue
 from a2a.types import (
-    Artifact,
     Message,
     Part,
     Role,
@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 
 def _utc_now() -> str:
-    return datetime.now(tz=timezone.utc).isoformat()
+    return datetime.now(tz=UTC).isoformat()
 
 
 def _text_message(text: str) -> Message:
@@ -110,6 +110,7 @@ class ApCoreAgentExecutor(AgentExecutor):
         apcore_ctx = None
         try:
             from apcore import Context  # type: ignore[import]
+
             apcore_ctx = Context.create(identity=identity) if identity else Context.create()
         except Exception:
             pass
@@ -130,7 +131,7 @@ class ApCoreAgentExecutor(AgentExecutor):
                 else call_async(skill_id, inputs)
             )
             output = await asyncio.wait_for(coro, timeout=self._execution_timeout)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             self._notify("working", "failed")
             await self._fail(context, event_queue, "Execution timed out")
             return
@@ -183,9 +184,7 @@ class ApCoreAgentExecutor(AgentExecutor):
         )
         self._notify("working", "canceled")
 
-    async def _fail(
-        self, context: RequestContext, event_queue: EventQueue, message: str
-    ) -> None:
+    async def _fail(self, context: RequestContext, event_queue: EventQueue, message: str) -> None:
         context_id = context.context_id or context.task_id
         await event_queue.enqueue_event(
             TaskStatusUpdateEvent(
@@ -200,9 +199,7 @@ class ApCoreAgentExecutor(AgentExecutor):
             )
         )
 
-    async def _input_required(
-        self, context: RequestContext, event_queue: EventQueue, message: str
-    ) -> None:
+    async def _input_required(self, context: RequestContext, event_queue: EventQueue, message: str) -> None:
         context_id = context.context_id or context.task_id
         await event_queue.enqueue_event(
             TaskStatusUpdateEvent(
