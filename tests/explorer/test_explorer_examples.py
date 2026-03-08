@@ -109,7 +109,7 @@ class TestExplorerIndex:
         assert "text/html" in resp.headers["content-type"]
 
     def test_contains_title(self, client):
-        assert "A2A Agent Explorer" in client.get("/explorer/").text
+        assert "APCore A2A Agent Explorer" in client.get("/explorer/").text
 
     def test_contains_ui_sections(self, client):
         html = client.get("/explorer/").text
@@ -393,7 +393,7 @@ class TestExplorerCustomPrefix:
         c = TestClient(custom_app)
         resp = c.get("/dev/")
         assert resp.status_code == 200
-        assert "A2A Agent Explorer" in resp.text
+        assert "APCore A2A Agent Explorer" in resp.text
 
     def test_custom_prefix_agent_card(self, custom_app):
         c = TestClient(custom_app)
