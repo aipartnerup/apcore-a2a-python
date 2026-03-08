@@ -37,7 +37,7 @@ It solves a common problem: **you've built AI capabilities with apcore modules, 
 ## Requirements
 
 - Python >= 3.11
-- `apcore` >= 0.7.0
+- `apcore` >= 0.9.0
 
 ---
 
@@ -51,19 +51,31 @@ pip install apcore-a2a
 
 ### Expose your modules as an A2A Agent
 
-If you already have apcore modules, three lines turn them into a discoverable agent:
+If you already have apcore modules, a few lines turn them into a discoverable agent:
 
 ```python
-from apcore import Registry
+from apcore import Executor, Registry
 from apcore_a2a import serve
 
 registry = Registry(extensions_dir="./extensions")
 registry.discover()
 
-serve(registry)  # Starts on http://0.0.0.0:8000
+serve(Executor(registry))  # Starts on http://0.0.0.0:8000
 ```
 
 Your agent is now live at `http://localhost:8000/.well-known/agent.json`.
+
+### Try the Examples
+
+Run all 5 example modules (3 class-based + 2 binding YAML) with the Explorer UI:
+
+```bash
+PYTHONPATH=./examples/binding_demo python examples/run.py
+```
+
+Open http://127.0.0.1:8000/explorer/ to browse skills, send messages, and stream responses.
+
+See [`examples/README.md`](examples/README.md) for more options (CLI, binding-only, JWT auth).
 
 ### Call a remote A2A Agent
 

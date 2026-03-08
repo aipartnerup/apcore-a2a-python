@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-03-08
+
+### Added
+
+#### Examples (`examples/`)
+- Unified launcher `examples/run.py` — starts all 5 example modules with Explorer UI
+- 3 class-based modules: `text_echo`, `math_calc`, `greeting`
+- 2 binding YAML modules: `convert_temperature`, `word_count` (zero-code integration via `myapp.py`)
+- Binding-only launcher `examples/binding_demo/run.py`
+- `examples/README.md` with quick start, Explorer UI guide, JWT auth, and cURL examples
+
+#### Tests
+- 54 integration tests (`tests/explorer/test_explorer_examples.py`) covering Explorer UI, agent card, all 5 skills end-to-end, streaming, task lifecycle, error cases, custom prefix, and disabled explorer
+
+### Fixed
+- **Explorer agent card serialization** — `AgentCard` Pydantic model now properly serialized via `model_dump()` before passing to `JSONResponse` (was causing `TypeError: Object of type AgentCard is not JSON serializable`)
+- **Explorer type hint** — `create_explorer_mount` parameter `agent_card` no longer incorrectly typed as `dict`
+
+### Changed
+- Bumped `apcore` dependency from `>=0.7.0` to `>=0.9.0`
+
+---
+
 ## [0.1.0] - 2026-03-06
 
 Initial release — automatic A2A protocol adapter for apcore Module Registry.
@@ -68,7 +91,7 @@ Initial release — automatic A2A protocol adapter for apcore Module Registry.
 - Skill discovery and interactive testing interface
 
 ### Dependencies
-- `apcore >= 0.7.0`
+- `apcore >= 0.9.0`
 - `a2a-sdk >= 0.3.20`
 - `starlette >= 0.40.0`
 - `uvicorn >= 0.30.0`
@@ -76,4 +99,5 @@ Initial release — automatic A2A protocol adapter for apcore Module Registry.
 - `PyJWT >= 2.0`
 - Python >= 3.11
 
+[0.2.0]: https://github.com/aipartnerup/apcore-a2a-python/releases/tag/v0.2.0
 [0.1.0]: https://github.com/aipartnerup/apcore-a2a-python/releases/tag/v0.1.0

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "apcore-a2a"
-version = "0.1.0"
+version = "0.2.0"
 description = "Automatic A2A Protocol Adapter for apcore Module Registry"
 readme = "README.md"
 license = "Apache-2.0"
@@ -12,7 +12,7 @@ requires-python = ">=3.11"
 authors = [
     { name = "aipartnerup", email = "team@aipartnerup.com" },
 ]
-keywords = ["apcore", "a2a", "agent", "ai", "multi-agent", "interoperability", "google-a2a", "server", "client", "protocol", "jwt", "streaming", "webhook"]
+keywords = ["apcore", "a2a", "agent", "ai", "multi-agent", "interoperability", "google-a2a", "server", "client", "protocol", "jwt", "streaming", "webhook", "sse", "llm", "agentic", "task-management"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -26,7 +26,7 @@ classifiers = [
     "Framework :: AsyncIO",
 ]
 dependencies = [
-    "apcore>=0.7.0",
+    "apcore>=0.9.0",
     "a2a-sdk[http-server]>=0.3.20",
     "starlette>=0.40.0",
     "uvicorn>=0.30.0",

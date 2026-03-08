@@ -9,7 +9,7 @@ from starlette.routing import Mount, Route
 
 
 def create_explorer_mount(
-    agent_card: dict,
+    agent_card,
     router,
     *,
     explorer_prefix: str = "/explorer",
@@ -27,7 +27,9 @@ def create_explorer_mount(
         return HTMLResponse(html_path.read_text())
 
     async def serve_agent_card(request):
-        return JSONResponse(agent_card)
+        # agent_card may be a Pydantic model (a2a.types.AgentCard); serialize it
+        data = agent_card.model_dump(mode="json", exclude_none=True) if hasattr(agent_card, "model_dump") else agent_card
+        return JSONResponse(data)
 
     return Mount(
         explorer_prefix,
