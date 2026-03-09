@@ -771,11 +771,14 @@
       }).join("");
       const container = document.getElementById("skills-list");
       container.innerHTML = html;
-      container.addEventListener("click", function (e) {
-        const link = e.target.closest(".example-link");
-        if (!link) return;
-        useExample(link.dataset.skillId, link.dataset.example);
-      });
+      if (!container._hasExampleClickListener) {
+        container.addEventListener("click", function (e) {
+          const link = e.target.closest(".example-link");
+          if (!link) return;
+          useExample(link.dataset.skillId, link.dataset.example);
+        });
+        container._hasExampleClickListener = true;
+      }
     }
 
     function populateSkillSelect(skills) {
