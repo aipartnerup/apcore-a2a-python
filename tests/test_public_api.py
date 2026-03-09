@@ -408,20 +408,20 @@ async def test_async_serve_with_path_string(tmp_path):
     ext_dir = tmp_path / "extensions"
     ext_dir.mkdir()
     (ext_dir / "echo.py").write_text(
-        'from pydantic import BaseModel\n'
-        '\n'
-        'class EchoInput(BaseModel):\n'
+        "from pydantic import BaseModel\n"
+        "\n"
+        "class EchoInput(BaseModel):\n"
         '    text: str = ""\n'
-        '\n'
-        'class EchoOutput(BaseModel):\n'
+        "\n"
+        "class EchoOutput(BaseModel):\n"
         '    text: str = ""\n'
-        '\n'
-        'class Echo:\n'
-        '    input_schema = EchoInput\n'
-        '    output_schema = EchoOutput\n'
+        "\n"
+        "class Echo:\n"
+        "    input_schema = EchoInput\n"
+        "    output_schema = EchoOutput\n"
         '    description = "Echo module"\n'
-        '\n'
-        '    def execute(self, inputs, ctx=None):\n'
+        "\n"
+        "    def execute(self, inputs, ctx=None):\n"
         '        return {"text": inputs.get("text", "")}\n'
     )
 
@@ -446,20 +446,20 @@ async def test_async_serve_with_pathlib_path(tmp_path):
     ext_dir = tmp_path / "extensions"
     ext_dir.mkdir()
     (ext_dir / "ping.py").write_text(
-        'from pydantic import BaseModel\n'
-        '\n'
-        'class PingInput(BaseModel):\n'
-        '    pass\n'
-        '\n'
-        'class PingOutput(BaseModel):\n'
-        '    pong: bool = True\n'
-        '\n'
-        'class Ping:\n'
-        '    input_schema = PingInput\n'
-        '    output_schema = PingOutput\n'
+        "from pydantic import BaseModel\n"
+        "\n"
+        "class PingInput(BaseModel):\n"
+        "    pass\n"
+        "\n"
+        "class PingOutput(BaseModel):\n"
+        "    pong: bool = True\n"
+        "\n"
+        "class Ping:\n"
+        "    input_schema = PingInput\n"
+        "    output_schema = PingOutput\n"
         '    description = "Ping module"\n'
-        '\n'
-        '    def execute(self, inputs, ctx=None):\n'
+        "\n"
+        "    def execute(self, inputs, ctx=None):\n"
         '        return {"pong": True}\n'
     )
 

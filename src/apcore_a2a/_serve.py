@@ -47,7 +47,7 @@ def _resolve_registry_and_executor(
         TypeError: if the object matches neither shape.
     """
     # Path shortcut: "./extensions" → Registry + discover + Executor
-    if isinstance(registry_or_executor, (str, Path)):
+    if isinstance(registry_or_executor, str | Path):
         from apcore import Registry
         from apcore.executor import Executor
 
